@@ -1,0 +1,161 @@
+= Format for Abstract Resource Representations (FARR)
+:author: Mike Amundsen
+:email: mca@mamund.com
+:toc:
+:numbered:
+:linkcss:
+:stylesdir: css
+:stylesheet: far-custom.css
+:scriptsdir: js
+
+== Overview:
+Author::
+  * Mike Amundsen
+  
+Status::
+  *[white red-background]#Working Draft#* -- _Only experimental and `proof-of-concept' apps should be built on this unstable draft._
+
+////
+  *[black yellow-background]#Stable Draft#* -- _It is safe to build demo apps on this stable draft._
+  *[white blue-background]#Submitted to IANA#* -- _This specification is not expected to introduce any breaking changes for this media-type._
+  *[white green-background]#Approved by IANA#* -- _This specification will not introduce any breaking changes for this media-type._
+////
+
+Last Updated::
+  {docdate}
+
+Proposed IANA Registrations::
+  * +application/vnd.farr+json+
+  * +application/vnd.farr+xml+ (TK:???)
+  * +application/vnd.farr+yaml+  (TK:???)
+  
+== General Overview
+The Format for Abstract Resource Representation (FARR) media type is designed to provide a general representation for information about resources. This is especially handy as an internal representation of an information resource that will be passed to a representation engine -- one that converts this general model into a specific format such as <<html,[HTML]>>, <<hal,[HAL]>>, <<cj,[Collection+JSON]>>, etc.
+
+(TK: "information resource" might be a loaded term.)
+
+=== Goals
+The goal of FARR is to make it possible to 1) represent an information resource (both data and actions) in a standard way and, 2) support the implementation of general-purpose code that can convert a FARR document into a valid target representation format. This should make it possible for a single service implementation to easily support multiple output representations by representing each information resource using FARR and then implementing one or more representation-specific engines that convert FARR into a target representation format. 
+
+=== Related Work
+This work is inspired by the <<hyperd,[HyperDescribe]>> format and the <<representor,[Representor]>> project.
+
+=== Compliance
+An implementation is not compliant if it fails to satisfy one or more of the MUST or REQUIRED elements. An implementation that satisfies all the MUST and REQUIRED elements as well as all the SHOULD and RECOMMENDED elements is said to be "unconditionally compliant"; one that satisfies all the MUST and REQUIRED elements but not all the SHOULD and RECOMMENDED elements is said to be "conditionally compliant."
+
+[NOTE]
+====
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC <<rfc2119,[RFC2119]>>.
+====
+
+== The FARR Document Model
+The FARR document model consists of two main sections (+actions+ and +data+) along with a secondary +extension+ section. 
+
+=== Properties Summary
+
++farr+::
+  The root property of all FARR documents. This is a REQUIRED property
++actions+::
+  The +actions+ property is an array of all the possible actions for the information resource. This is an OPTIONAL property.
++data+::
+  The +data+ property is an array of all the data for the information resource. This is an OPTIONAL property.
+
+=== +action+
+The +action+ array holds one or more anonymous objects with the following layout:
+
+.Layout of the +action+ object+
+----
+{
+  "name": "addForm",
+  "type": "unsafe", (TK: aspects here? safety, idempotence, mutability, transclusion)
+  "kind": "todo", (TK: returns?)
+  "target": "list", (TK: drop this?)
+  "prompt": "Add ToDo",
+  "inputs": [ (TK: regex? errormsg? options-style, radio?, dropdown?)
+    {
+      "name": "title",
+      "prompt": "Title"
+    },
+    {
+      "name": "completed",
+      "prompt": "Complete",
+      "value": "false"
+    }
+  ],
+  "href": "//localhost:8181/", (TK: media-type hint? accept/content-type? title? alt? 
+  "rel": [
+    "create-form"
+  ]
+}
+----
+
+== Sample FARR Documents
+Below are sample FARR documents
+
+.Minimal FARR Document
+[source, javascript]
+----
+include::includes/minimal-farr-doc.js[]
+----
+
+.Full FARR Document
+[source, javascript]
+----
+include::includes/full-farr-doc.js[]
+----
+
+== Extensibility
+This specification describes the FARR document-format's markup vocabulary. Markup from other vocabularies ("foreign markup") can be used in an FARR document. Any extensions to the FARR document format MUST NOT redefine any objects (or their properties), arrays, properties, or data types defined in this document. Implementations that do not recognize extensions to the FARR format SHOULD ignore them.
+
+The details of designing and implementing FARR extensions is beyond the scope of this document.
+
+TK:Notes on extensibility (which will be essential for this format to work)
+
+Any element can have an added +ext+ array.
+
+----
+actions[{name:"sample", "ext":[...]}]
+----
+
+The +ext+ array can have one or more child properties that match the target media type (e.g. +application/vnd.hal+json+, +text/html+, etc.).
+
+----
+actions[{name:"sample", "ext":[{"text/html":[]}]}]
+----
+ 
+[NOTE]
+====
+It is possible that future forward-compatible modifications to this specification will include new objects, arrays, properties, link-relations, and data types. Extension designers should take care to prevent future modifications from breaking or redefining those extensions.
+====
+
+== IANA Considerations
+Below are the related IANA considerations for this media type design.
+
+=== JSON Media Type Registration
++++[pending submission]+++
+
+=== Security Considerations
+The FARR document format shares security issues common to all JSON content types. See RFC4627 Section #6 <<rfc4627,[RFC4627]>> for additional information. The FARR document format does not provide executable content. Information contained in FARR documents does not require privacy or integrity services.
+
+=== Internationalization Considerations
+The FARR document format does not have any internationalization considerations other than those which are discussed in referenced RFC documents (see below).
+
+== References
+Below are the references used in this document.
+
+=== Normative References
+ * [[rfc2119]] [RFC2119] Bradner, S.,"Key words for use in RFCs to Indicate Requirement Levels", March 1997, http://tools.ietf.org/html/rfc2119
+ * [[rfc3986]] [RFC3986] Berners-Lee, T., Fielding, R., and L. Masinter,"Uniform Resource Identifier (URI): Generic Syntax", January 2005, http://tools.ietf.org/html/rfc3986
+ * [[rfc4627]] [RFC4627] D. Crockford, "The application/json Media Type for JavaScript Object Notation (JSON)", July 2006, http://tools.ietf.org/html/rfc4627
+ * [[rfc6570]] [RFC6570] Gregorio, J., Fielding, R., Hadley, M., Nottingham, M., Orchard, D., "URI Template", March 2012, http://tools.ietf.org/html/rfc6570
+
+=== Informative References
+ * [[html]] [HTML]
+ * [[hal]] [HAL]
+ * [[cj]] [Collection+JSON]
+ * [[hyperd]] [HyperDescribe]
+ * [[representor]] [Representor]
+  
+== Acknowledgements
+(TK:content goes here)
+

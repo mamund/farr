@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="generator" content="AsciiDoc 8.6.9">
+<title>Format for Abstract Resource Representations (FARR)</title>
+<link rel="stylesheet" href="css/asciidoc.css" type="text/css">
+
+
+<link rel="stylesheet" href="css/far-custom.css" type="text/css">
+<script type="text/javascript" src="js/asciidoc.js"></script>
+<script type="text/javascript">
+/*<![CDATA[*/
+asciidoc.install(2);
+/*]]>*/
+</script>
+</head>
+<body class="article">
+<div id="header">
+<h1>Format for Abstract Resource Representations (FARR)</h1>
+<span id="author">Mike Amundsen</span><br>
+<span id="email" class="monospaced">&lt;<a href="mailto:mca@mamund.com">mca@mamund.com</a>&gt;</span><br>
+<div id="toc">
+  <div id="toctitle">Table of Contents</div>
+  <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_overview">1. Overview:</h2>
+<div class="sectionbody">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Author
+</dt>
+<dd>
+<div class="ulist"><ul>
+<li>
+<p>
+Mike Amundsen
+</p>
+</li>
+</ul></div>
+</dd>
+<dt class="hdlist1">
+Status
+</dt>
+<dd>
+<p>
+  <strong><span class="white red-background">Working Draft</span></strong>&#8201;&#8212;&#8201;<em>Only experimental and &#8216;proof-of-concept&#8217; apps should be built on this unstable draft.</em>
+</p>
+</dd>
+</dl></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Last Updated
+</dt>
+<dd>
+<p>
+  2015-06-08
+</p>
+</dd>
+<dt class="hdlist1">
+Proposed IANA Registrations
+</dt>
+<dd>
+<div class="ulist"><ul>
+<li>
+<p>
+<span class="monospaced">application/vnd.farr+json</span>
+</p>
+</li>
+<li>
+<p>
+<span class="monospaced">application/vnd.farr+xml</span> (TK:???)
+</p>
+</li>
+<li>
+<p>
+<span class="monospaced">application/vnd.farr+yaml</span>  (TK:???)
+</p>
+</li>
+</ul></div>
+</dd>
+</dl></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_general_overview">2. General Overview</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The Format for Abstract Resource Representation (FARR) media type is designed to provide a general representation for information about resources. This is especially handy as an internal representation of an information resource that will be passed to a representation engine&#8201;&#8212;&#8201;one that converts this general model into a specific format such as <a href="#html">[HTML]</a>, <a href="#hal">[HAL]</a>, <a href="#cj">[Collection+JSON]</a>, etc.</p></div>
+<div class="paragraph"><p>(TK: "information resource" might be a loaded term.)</p></div>
+<div class="sect2">
+<h3 id="_goals">2.1. Goals</h3>
+<div class="paragraph"><p>The goal of FARR is to make it possible to 1) represent an information resource (both data and actions) in a standard way and, 2) support the implementation of general-purpose code that can convert a FARR document into a valid target representation format. This should make it possible for a single service implementation to easily support multiple output representations by representing each information resource using FARR and then implementing one or more representation-specific engines that convert FARR into a target representation format.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_related_work">2.2. Related Work</h3>
+<div class="paragraph"><p>This work is inspired by the <a href="#hyperd">[HyperDescribe]</a> format and the <a href="#representor">[Representor]</a> project.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_compliance">2.3. Compliance</h3>
+<div class="paragraph"><p>An implementation is not compliant if it fails to satisfy one or more of the MUST or REQUIRED elements. An implementation that satisfies all the MUST and REQUIRED elements as well as all the SHOULD and RECOMMENDED elements is said to be "unconditionally compliant"; one that satisfies all the MUST and REQUIRED elements but not all the SHOULD and RECOMMENDED elements is said to be "conditionally compliant."</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img alt="Note" src="data:image/png;base64,
+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">
+</td>
+<td class="content">
+<div class="paragraph"><p>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC <a href="#rfc2119">[RFC2119]</a>.</p></div>
+</td>
+</tr></table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_farr_document_model">3. The FARR Document Model</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The FARR document model consists of two main sections (<span class="monospaced">actions</span> and <span class="monospaced">data</span>) along with a secondary <span class="monospaced">extension</span> section.</p></div>
+<div class="sect2">
+<h3 id="_properties_summary">3.1. Properties Summary</h3>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<span class="monospaced">farr</span>
+</dt>
+<dd>
+<p>
+  The root property of all FARR documents. This is a REQUIRED property
+</p>
+</dd>
+<dt class="hdlist1">
+<span class="monospaced">actions</span>
+</dt>
+<dd>
+<p>
+  The <span class="monospaced">actions</span> property is an array of all the possible actions for the information resource. This is an OPTIONAL property.
+</p>
+</dd>
+<dt class="hdlist1">
+<span class="monospaced">data</span>
+</dt>
+<dd>
+<p>
+  The <span class="monospaced">data</span> property is an array of all the data for the information resource. This is an OPTIONAL property.
+</p>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_span_class_monospaced_action_span">3.2. <span class="monospaced">action</span></h3>
+<div class="paragraph"><p>The <span class="monospaced">action</span> array holds one or more anonymous objects with the following layout:</p></div>
+<div class="listingblock">
+<div class="title">Layout of the <span class="monospaced">action</span> object+</div>
+<div class="content monospaced">
+<pre>{
+  "name": "addForm",
+  "type": "unsafe", (TK: aspects here? safety, idempotence, mutability, transclusion)
+  "kind": "todo", (TK: returns?)
+  "target": "list", (TK: drop this?)
+  "prompt": "Add ToDo",
+  "inputs": [ (TK: regex? errormsg? options-style, radio?, dropdown?)
+    {
+      "name": "title",
+      "prompt": "Title"
+    },
+    {
+      "name": "completed",
+      "prompt": "Complete",
+      "value": "false"
+    }
+  ],
+  "href": "//localhost:8181/", (TK: media-type hint? accept/content-type? title? alt?
+  "rel": [
+    "create-form"
+  ]
+}</pre>
+</div></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_sample_farr_documents">4. Sample FARR Documents</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Below are sample FARR documents</p></div>
+<div class="listingblock">
+<div class="title">Minimal FARR Document</div>
+<div class="content"><!-- Generator: GNU source-highlight 2.1.2
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #FF0000">{</span>
+  <span style="color: #FF0000">"farr"</span> <span style="color: #990000">:</span> <span style="color: #FF0000">{</span>
+    <span style="color: #FF0000">"version"</span> <span style="color: #990000">:</span> <span style="color: #FF0000">"1.0"</span><span style="color: #990000">,</span>
+    <span style="color: #FF0000">"resources"</span> <span style="color: #990000">:</span> <span style="color: #990000">[</span>
+      <span style="color: #FF0000">"{name}"</span> <span style="color: #990000">:</span> <span style="color: #FF0000">{</span>
+        <span style="color: #FF0000">"actions"</span> <span style="color: #990000">:</span> <span style="color: #990000">[</span>
+        <span style="color: #990000">]</span><span style="color: #990000">,</span>
+        <span style="color: #FF0000">"data"</span> <span style="color: #990000">:</span> <span style="color: #990000">[</span>
+        <span style="color: #990000">]</span><span style="color: #990000">,</span>
+        <span style="color: #FF0000">"fext"</span> <span style="color: #990000">:</span> <span style="color: #990000">[</span>
+        <span style="color: #990000">]</span>
+      <span style="color: #FF0000">}</span>
+    <span style="color: #990000">]</span>
+  <span style="color: #FF0000">}</span>
+<span style="color: #FF0000">}</span>
+</tt></pre></div></div>
+<div class="listingblock">
+<div class="title">Full FARR Document</div>
+<div class="content"><!-- Generator: GNU source-highlight 2.1.2
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><span style="color: #FF0000">{</span>
+  <span style="color: #FF0000">"farr"</span><span style="color: #990000">:</span> <span style="color: #FF0000">{</span>
+    <span style="color: #FF0000">"version"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"1.0"</span><span style="color: #990000">,</span>
+    <span style="color: #FF0000">"resources"</span><span style="color: #990000">:</span> <span style="color: #990000">[</span>
+      <span style="color: #FF0000">"todo"</span><span style="color: #990000">:</span> <span style="color: #FF0000">{</span>
+        <span style="color: #FF0000">"title"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"ToDo"</span><span style="color: #990000">,</span>
+        <span style="color: #FF0000">"actions"</span><span style="color: #990000">:</span> <span style="color: #990000">[</span>
+          <span style="color: #FF0000">{</span>
+            <span style="color: #FF0000">"name"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"selfLink"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"type"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"safe"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"kind"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"self"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"target"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"item"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"prompt"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"Reload"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"href"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"//localhost:8181/"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"rel"</span><span style="color: #990000">:</span> <span style="color: #990000">[</span>
+              <span style="color: #FF0000">"self"</span>
+            <span style="color: #990000">]</span>
+          <span style="color: #FF0000">}</span><span style="color: #990000">,</span>
+          <span style="color: #990000">.</span><span style="color: #990000">.</span><span style="color: #990000">.</span>
+          <span style="color: #FF0000">{</span>
+            <span style="color: #FF0000">"name"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"listActive"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"type"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"safe"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"kind"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"todo"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"target"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"list"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"prompt"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"Active ToDos"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"inputs"</span><span style="color: #990000">:</span> <span style="color: #990000">[</span>
+              <span style="color: #FF0000">{</span>
+                <span style="color: #FF0000">"name"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"completed"</span><span style="color: #990000">,</span>
+                <span style="color: #FF0000">"prompt"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"Complete"</span><span style="color: #990000">,</span>
+                <span style="color: #FF0000">"value"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"false"</span>
+              <span style="color: #FF0000">}</span>
+            <span style="color: #990000">]</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"href"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"//localhost:8181/"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"rel"</span><span style="color: #990000">:</span> <span style="color: #990000">[</span>
+              <span style="color: #FF0000">"active"</span><span style="color: #990000">,</span>
+              <span style="color: #FF0000">"collection"</span>
+            <span style="color: #990000">]</span>
+          <span style="color: #FF0000">}</span><span style="color: #990000">,</span>
+          <span style="color: #FF0000">{</span>
+            <span style="color: #FF0000">"name"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"addForm"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"type"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"unsafe"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"kind"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"todo"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"target"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"list"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"prompt"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"Add ToDo"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"inputs"</span><span style="color: #990000">:</span> <span style="color: #990000">[</span>
+              <span style="color: #FF0000">{</span>
+                <span style="color: #FF0000">"name"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"title"</span><span style="color: #990000">,</span>
+                <span style="color: #FF0000">"prompt"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"Title"</span>
+              <span style="color: #FF0000">}</span><span style="color: #990000">,</span>
+              <span style="color: #FF0000">{</span>
+                <span style="color: #FF0000">"name"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"completed"</span><span style="color: #990000">,</span>
+                <span style="color: #FF0000">"prompt"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"Complete"</span><span style="color: #990000">,</span>
+                <span style="color: #FF0000">"value"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"false"</span>
+              <span style="color: #FF0000">}</span>
+            <span style="color: #990000">]</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"href"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"//localhost:8181/"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"rel"</span><span style="color: #990000">:</span> <span style="color: #990000">[</span>
+              <span style="color: #FF0000">"create-form"</span>
+            <span style="color: #990000">]</span>
+          <span style="color: #FF0000">}</span>
+        <span style="color: #990000">]</span><span style="color: #990000">,</span>
+        <span style="color: #FF0000">"data"</span><span style="color: #990000">:</span> <span style="color: #990000">[</span>
+          <span style="color: #FF0000">{</span>
+            <span style="color: #FF0000">"farr"</span><span style="color: #990000">:</span> <span style="color: #FF0000">{</span>
+              <span style="color: #FF0000">"rel"</span><span style="color: #990000">:</span> <span style="color: #990000">[</span>
+                <span style="color: #FF0000">"item"</span>
+              <span style="color: #990000">]</span><span style="color: #990000">,</span>
+              <span style="color: #FF0000">"href"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"//localhost:8181/1b361exznny"</span>
+            <span style="color: #FF0000">}</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"id"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"1b361exznny"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"title"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"one more test"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"completed"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"true"</span>
+          <span style="color: #FF0000">}</span><span style="color: #990000">,</span>
+          <span style="color: #FF0000">{</span>
+            <span style="color: #FF0000">"farr"</span><span style="color: #990000">:</span> <span style="color: #FF0000">{</span>
+              <span style="color: #FF0000">"rel"</span><span style="color: #990000">:</span> <span style="color: #990000">[</span>
+                <span style="color: #FF0000">"item"</span>
+              <span style="color: #990000">]</span><span style="color: #990000">,</span>
+              <span style="color: #FF0000">"href"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"//localhost:8181/1i8ucmc9nwb"</span>
+            <span style="color: #FF0000">}</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"id"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"1i8ucmc9nwb"</span><span style="color: #990000">,</span>
+            <span style="color: #FF0000">"completed"</span><span style="color: #990000">:</span> <span style="color: #FF0000">"false"</span>
+          <span style="color: #FF0000">}</span><span style="color: #990000">,</span>
+        <span style="color: #990000">]</span>
+      <span style="color: #FF0000">}</span>
+    <span style="color: #990000">]</span>
+  <span style="color: #FF0000">}</span>
+<span style="color: #FF0000">}</span>
+</tt></pre></div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_extensibility">5. Extensibility</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>This specification describes the FARR document-format&#8217;s markup vocabulary. Markup from other vocabularies ("foreign markup") can be used in an FARR document. Any extensions to the FARR document format MUST NOT redefine any objects (or their properties), arrays, properties, or data types defined in this document. Implementations that do not recognize extensions to the FARR format SHOULD ignore them.</p></div>
+<div class="paragraph"><p>The details of designing and implementing FARR extensions is beyond the scope of this document.</p></div>
+<div class="paragraph"><p>TK:Notes on extensibility (which will be essential for this format to work)</p></div>
+<div class="paragraph"><p>Any element can have an added <span class="monospaced">ext</span> array.</p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>actions[{name:"sample", "ext":[...]}]</pre>
+</div></div>
+<div class="paragraph"><p>The <span class="monospaced">ext</span> array can have one or more child properties that match the target media type (e.g. <span class="monospaced">application/vnd.hal+json</span>, <span class="monospaced">text/html</span>, etc.).</p></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>actions[{name:"sample", "ext":[{"text/html":[]}]}]</pre>
+</div></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img alt="Note" src="data:image/png;base64,
+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">
+</td>
+<td class="content">
+<div class="paragraph"><p>It is possible that future forward-compatible modifications to this specification will include new objects, arrays, properties, link-relations, and data types. Extension designers should take care to prevent future modifications from breaking or redefining those extensions.</p></div>
+</td>
+</tr></table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_iana_considerations">6. IANA Considerations</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Below are the related IANA considerations for this media type design.</p></div>
+<div class="sect2">
+<h3 id="_json_media_type_registration">6.1. JSON Media Type Registration</h3>
+<div class="paragraph"><p>[pending submission]</p></div>
+</div>
+<div class="sect2">
+<h3 id="_security_considerations">6.2. Security Considerations</h3>
+<div class="paragraph"><p>The FARR document format shares security issues common to all JSON content types. See RFC4627 Section #6 <a href="#rfc4627">[RFC4627]</a> for additional information. The FARR document format does not provide executable content. Information contained in FARR documents does not require privacy or integrity services.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_internationalization_considerations">6.3. Internationalization Considerations</h3>
+<div class="paragraph"><p>The FARR document format does not have any internationalization considerations other than those which are discussed in referenced RFC documents (see below).</p></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_references">7. References</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Below are the references used in this document.</p></div>
+<div class="sect2">
+<h3 id="_normative_references">7.1. Normative References</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+<a id="rfc2119"></a> [RFC2119] Bradner, S.,"Key words for use in RFCs to Indicate Requirement Levels", March 1997, <a href="http://tools.ietf.org/html/rfc2119">http://tools.ietf.org/html/rfc2119</a>
+</p>
+</li>
+<li>
+<p>
+<a id="rfc3986"></a> [RFC3986] Berners-Lee, T., Fielding, R., and L. Masinter,"Uniform Resource Identifier (URI): Generic Syntax", January 2005, <a href="http://tools.ietf.org/html/rfc3986">http://tools.ietf.org/html/rfc3986</a>
+</p>
+</li>
+<li>
+<p>
+<a id="rfc4627"></a> [RFC4627] D. Crockford, "The application/json Media Type for JavaScript Object Notation (JSON)", July 2006, <a href="http://tools.ietf.org/html/rfc4627">http://tools.ietf.org/html/rfc4627</a>
+</p>
+</li>
+<li>
+<p>
+<a id="rfc6570"></a> [RFC6570] Gregorio, J., Fielding, R., Hadley, M., Nottingham, M., Orchard, D., "URI Template", March 2012, <a href="http://tools.ietf.org/html/rfc6570">http://tools.ietf.org/html/rfc6570</a>
+</p>
+</li>
+</ul></div>
+</div>
+<div class="sect2">
+<h3 id="_informative_references">7.2. Informative References</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+<a id="html"></a> [HTML]
+</p>
+</li>
+<li>
+<p>
+<a id="hal"></a> [HAL]
+</p>
+</li>
+<li>
+<p>
+<a id="cj"></a> [Collection+JSON]
+</p>
+</li>
+<li>
+<p>
+<a id="hyperd"></a> [HyperDescribe]
+</p>
+</li>
+<li>
+<p>
+<a id="representor"></a> [Representor]
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_acknowledgements">8. Acknowledgements</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>(TK:content goes here)</p></div>
+</div>
+</div>
+</div>
+<div id="footnotes"><hr></div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2015-06-08 14:26:09 Eastern Daylight Time
+</div>
+</div>
+</body>
+</html>
