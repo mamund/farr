@@ -33,5 +33,7 @@ The FARR document work is related to several existing projects and borrows/share
 - [HyperDescribe](https://github.com/smizell/hyperdescribe)
 - [ALPS](http://alps.io/spec/index.html)
 
+It is possible that FARR will disappear if/when the related projects (or some other one(s)) solve the same problem in a better/more-acceptable manner.
+
 @mamund
 
